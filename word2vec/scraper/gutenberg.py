@@ -39,8 +39,8 @@ class GutenbergSpanishScraper:
     async def download_books(self):
         if len(self.book_ids) == 0:
             raise ValueError("No book ids to download, did you call `scrape_book_ids` first?")
-        
-        async with httpx.AsyncClient(timeout=self.timeout) as client:
+
+        async with httpx.AsyncClient(follow_redirects=True, timeout=self.timeout) as client:
             with tqdm(total=len(self.book_ids), desc="Downloading Spanish books") as progress_bar:
                 tasks = [self._download_book(client, book_id, progress_bar) for book_id in self.book_ids]
                 await asyncio.gather(*tasks)
