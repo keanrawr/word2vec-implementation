@@ -10,6 +10,7 @@ class GutenbergSpanishScraper:
     Scraper class to download Spanish books that are available in the
     Gutenberg project's page
     """
+
     results_url = "https://www.gutenberg.org/ebooks/results/?author=&title=&subject=&lang=es&category=&locc=&filetype=txt.utf-8&submit_search=Search&pageno="
     file_base_url = "https://www.gutenberg.org/ebooks/{book_id}.txt.utf-8"
 
@@ -29,17 +30,19 @@ class GutenbergSpanishScraper:
         res = requests.get(url)
         soup = BeautifulSoup(res.content, "html.parser")
         table = soup.select_one("#content table")
-        rows = table.find_all('tr')[1:]
+        rows = table.find_all("tr")[1:]
         for row in rows:
-            cols = row.find_all('td')
+            cols = row.find_all("td")
             if cols:
                 book_id = cols[0].text.strip()
                 self.book_ids.append(book_id)
 
     def download_books(self):
         if len(self.book_ids) == 0:
-            raise ValueError("No book id's to download, did you call `scrape_book_ids` first?")
-        
+            raise ValueError(
+                "No book id's to download, did you call `scrape_book_ids` first?"
+            )
+
         for book_id in tqdm(self.book_ids, desc="Downloading Spanish books"):
             target_url = self.file_base_url.format(book_id=book_id)
             target_file = self.data_dir / f"{book_id}.txt"

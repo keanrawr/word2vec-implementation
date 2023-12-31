@@ -7,7 +7,7 @@ from nltk.tokenize import word_tokenize
 
 
 class GutenbergTextProcessor:
-    def __init__(self, nltk_dir: str="data/nltk_data"):
+    def __init__(self, nltk_dir: str = "data/nltk_data"):
         self.nltk_dir = Path(nltk_dir)
         self.nltk_dir.mkdir(parents=True, exist_ok=True)
         nltk.data.path.append(str(self.nltk_dir))
@@ -21,13 +21,17 @@ class GutenbergTextProcessor:
             text = file.read()
 
         start_idx, end_idx = self.find_gutenberg_delimiters(text)
-        main_text = text[start_idx:end_idx] if start_idx != -1 and end_idx != -1 else text
+        main_text = (
+            text[start_idx:end_idx] if start_idx != -1 and end_idx != -1 else text
+        )
 
         cleaned_text = re.sub(r"[^a-zA-Z\s]", " ", main_text)
         tokens = word_tokenize(cleaned_text)
         normalized_tokens = [token.lower() for token in tokens]
 
-        return [token for token in normalized_tokens if token not in self.spanish_stopwords]
+        return [
+            token for token in normalized_tokens if token not in self.spanish_stopwords
+        ]
 
     def find_gutenberg_delimiters(self, text):
         # Function to find the start and end index of the main content in a Gutenberg text
@@ -37,7 +41,7 @@ class GutenbergTextProcessor:
                 "START OF THE PROJECT GUTENBERG EBOOK",
                 "START OF THE PROJECT GUTENBERG",
                 "START OF PROJECT GUTENBERG",
-                "THE PROJECT GUTENBERG EBOOK"
+                "THE PROJECT GUTENBERG EBOOK",
             ]
             for phrase in intro_phrases:
                 index = text.find(phrase)
@@ -51,7 +55,7 @@ class GutenbergTextProcessor:
                 "END OF THIS PROJECT GUTENBERG EBOOK",
                 "END OF THE PROJECT GUTENBERG EBOOK",
                 "END OF PROJECT GUTENBERG",
-                "END OF THE PROJECT GUTENBERG"
+                "END OF THE PROJECT GUTENBERG",
             ]
             for phrase in concluding_phrases:
                 index = text.find(phrase)
