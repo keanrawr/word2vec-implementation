@@ -9,16 +9,17 @@ class GutenbergSpanishScraper:
     results_url = "https://www.gutenberg.org/ebooks/results/?author=&title=&subject=&lang=es&category=&locc=&filetype=txt.utf-8&submit_search=Search&pageno="
     file_base_url = "https://www.gutenberg.org/ebooks/{book_id}.txt.utf-8"
 
-    def __init__(self, data_dir: str):
+    def __init__(self, data_dir: str, timeout: int = 60):
         self.data_dir = Path(data_dir)
         self.book_ids = list()
+        self.timeout = timeout
 
         self.data_dir.mkdir(parents=True, exist_ok=True)
 
     async def scrape_book_ids(self):
         target_urls = [f"{self.results_url}{page}" for page in range(1, 10)]
 
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
             with tqdm(total=len(target_urls), desc="Scraping Spanish book IDs") as progress_bar:
                 tasks = [self._scrape_book_id(client, url, progress_bar) for url in target_urls]
                 await asyncio.gather(*tasks)
@@ -37,9 +38,9 @@ class GutenbergSpanishScraper:
 
     async def download_books(self):
         if len(self.book_ids) == 0:
-            raise ValueError("No book id's to download, did you call `scrape_book_ids` first?")
+            raise ValueError("No book ids to download, did you call `scrape_book_ids` first?")
         
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
             with tqdm(total=len(self.book_ids), desc="Downloading Spanish books") as progress_bar:
                 tasks = [self._download_book(client, book_id, progress_bar) for book_id in self.book_ids]
                 await asyncio.gather(*tasks)
