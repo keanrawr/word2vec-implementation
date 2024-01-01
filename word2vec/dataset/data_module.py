@@ -17,7 +17,7 @@ class Word2VecDataset(Dataset):
         context_target_pairs = []
 
         # Skip the first and last "window_size" words to ensure consistent context size
-        for i in tqdm(range(self.window_size, len(self.words) - self.window_size)):
+        for i in tqdm(range(self.window_size, len(self.words) - self.window_size), desc="Generating pairs"):
             target_word = self.words[i]
             context_words = (
                 self.words[i - self.window_size : i]
