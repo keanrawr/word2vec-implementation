@@ -1,0 +1,22 @@
+scrape:
+  books_dir: data/books
+  timeout: 60
+
+process:
+  books_dir: ${scrape.books_dir}
+  min_word_count: 900
+  vocab_dir: data/vocab
+  vocab_file_name: spanish-vocab.pkl
+  corpus_dir: data/corpus
+  corpus_file_name: spanish-corpus.pkl
+
+train:
+  embedding_size: 100
+  vocab_path: ${process.vocab_dir}/${process.vocab_file_name}
+  corpus_path: ${process.corpus_dir}/${process.corpus_file_name}
+  trainer:
+    max_epochs: 1
+  mlflow_logger:
+    experiment_name: pytorch-word2vec
+    tracking_uri: http://localhost:5000
+    log_model: all
