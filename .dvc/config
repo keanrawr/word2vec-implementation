@@ -1,0 +1,4 @@
+[core]
+    remote = word2vec
+['remote "word2vec"']
+    url = s3://kean-misc/dvc/word2vec
