@@ -1,9 +1,14 @@
 import asyncio
 from word2vec.scraper import GutenbergSpanishScraper
 
-scraper = GutenbergSpanishScraper("data/books", timeout=120)
+from jobs.settings import settings
+
+
+scraper = GutenbergSpanishScraper(
+    data_dir=settings.scrape.books_dir,
+    timeout=settings.scrape.timeout
+)
 async def run_scraper():
-    await scraper.scrape_book_ids()
     await scraper.download_books()
 
 asyncio.run(run_scraper())

@@ -1,9 +1,9 @@
 import httpx
+import pickle
 import asyncio
 
 from tqdm import tqdm
 from pathlib import Path
-from bs4 import BeautifulSoup
 
 
 class GutenbergSpanishScraper:
@@ -12,35 +12,14 @@ class GutenbergSpanishScraper:
 
     def __init__(self, data_dir: str, timeout: int = 60):
         self.data_dir = Path(data_dir)
-        self.book_ids = list()
         self.timeout = timeout
 
         self.data_dir.mkdir(parents=True, exist_ok=True)
 
-    async def scrape_book_ids(self):
-        target_urls = [f"{self.results_url}{page}" for page in range(1, 10)]
+        book_ids_path = Path(__file__).parent / "spanish_books_ids.pkl"
+        with open(book_ids_path, "rb") as f:
+            self.book_ids = pickle.load(f)
 
-        async with httpx.AsyncClient(timeout=self.timeout) as client:
-            with tqdm(
-                total=len(target_urls), desc="Scraping Spanish book IDs"
-            ) as progress_bar:
-                tasks = [
-                    self._scrape_book_id(client, url, progress_bar)
-                    for url in target_urls
-                ]
-                await asyncio.gather(*tasks)
-
-    async def _scrape_book_id(self, client, url, progress_bar):
-        res = await client.get(url)
-        soup = BeautifulSoup(res.content, "html.parser")
-        table = soup.select_one("#content table")
-        rows = table.find_all("tr")[1:]
-        for row in rows:
-            cols = row.find_all("td")
-            if cols:
-                book_id = cols[0].text.strip()
-                self.book_ids.append(book_id)
-        progress_bar.update(1)
 
     async def download_books(self):
         if len(self.book_ids) == 0:
