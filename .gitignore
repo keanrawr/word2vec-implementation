@@ -161,4 +161,7 @@ cython_debug/
 
 # data directory
 data/
+
+# other ignores
+perf-logs/*.txt
 .DS_Store
